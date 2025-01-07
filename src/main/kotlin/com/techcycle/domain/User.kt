@@ -70,16 +70,11 @@ data class User(
     @Column(name = "updated_at")
     @LastModifiedDate
     var updatedAt: Instant? = null,
-
-    @OneToMany(
-        mappedBy = "user",
-        cascade = [CascadeType.ALL],
-        fetch = FetchType.EAGER
-    ) var roles: MutableSet<UserRole> = mutableSetOf(),
 ) : UserDetails {
     override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
-        return roles.map { SimpleGrantedAuthority(it.role.roleName) }.toMutableList()
+        return mutableListOf(SimpleGrantedAuthority("ROLE_USER"))
     }
+
 
     override fun getPassword(): String {
         return passwordHash

@@ -28,6 +28,7 @@ class OrderService(
     private val productImagesService: ProductImagesService,
     private val orderStatusHistoryRepository: OrderStatusHistoryRepository,
     private val interactionService: InteractionService,
+    private val notificationService: NotificationService,
 ) {
     fun getPaymentMethods() = PaymentMethod.entries.map { it.type }.toTypedArray()
 
@@ -90,6 +91,9 @@ class OrderService(
             )
         }.also { orderItemRepository.saveAll(it) }.forEach { orderItem ->
             orderItem.product.stockQuantity = orderItem.product.stockQuantity?.minus(orderItem.quantity)
+            if (orderItem.product.stockQuantity != null && orderItem.product.stockQuantity == 0L) {
+                notificationService.notifyOutOfStock(orderItem.product)
+            }
             productRepository.save(orderItem.product)
         }
         cart.status = CartStatus.ORDERED

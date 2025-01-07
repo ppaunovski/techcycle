@@ -1,6 +1,6 @@
 "use client";
-import React, {useEffect, useState} from 'react';
-import { Plus, Edit, Save, X, Search } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Plus, Edit, Save, X, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -9,71 +9,99 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 const ProductAdmin = () => {
-    const [products, setProducts] = useState([
-        {
-            product_id: 1,
-            name: 'NVIDIA GTX 1080',
-            stock_quantity: 15,
-            price: 299.99,
-            condition: 'GOOD',
-            brand_id: 1,
-            status: 'ACTIVE'
-        },
-        // Add more sample products as needed
-    ]);
-
-    const fetchProducts = async () => {
-        const response = await fetch("/api/products")
-    }
-
-    useEffect(() => {
-        fetchProducts;
-    }, []);
-
+    const [products, setProducts] = useState([]);
+    const [totalPages, setTotalPages] = useState(0);
+    const [totalItems, setTotalItems] = useState(0);
+    const [currentPage, setCurrentPage] = useState(0);
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [editingProduct, setEditingProduct] = useState(null);
     const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
 
+    const pageSize = 20;
+
     const initialNewProduct = {
         name: '',
-        stock_quantity: 0,
-        price: 0,
-        condition: 'GOOD',
-        brand_id: '',
-        status: 'ACTIVE',
         description: '',
-        model_number: '',
-        manufacturing_date: '',
-        technical_specs: {},
-        warranty_info: ''
+        detailedDescription: '',
+        technicalSpecs: {},
+        price: 0,
+        stockQuantity: 0,
+        lowStockThreshold: 5,
+        condition: 'GOOD',
+        warrantyInfo: '',
+        brandId: '',
+        modelNumber: '',
+        manufacturingDate: '',
+        weight: '',
+        dimensions: {},
+        featured: false,
+        status: 'ACTIVE'
     };
 
     const [newProduct, setNewProduct] = useState(initialNewProduct);
 
-    const handleQuantityChange = (productId, newQuantity) => {
-        setProducts(products.map(product =>
-            product.product_id === productId
-                ? { ...product, stock_quantity: parseInt(newQuantity) }
-                : product
-        ));
+    const fetchProducts = async () => {
+        setIsLoading(true);
+        setError(null);
+        try {
+            const response = await fetch(
+                `/api/products?page=${currentPage}&limit=${pageSize}&search=${searchTerm}`
+            );
+            if (!response.ok) throw new Error('Failed to fetch products');
+            const data = await response.json();
+            setProducts(data.products);
+            setTotalPages(data.totalPages);
+            setTotalItems(data.totalItems);
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
-    const handleAddProduct = () => {
-        // Here you would typically make an API call to add the product
-        const productWithId = {
-            ...newProduct,
-            product_id: Math.max(...products.map(p => p.product_id)) + 1
-        };
-        setProducts([...products, productWithId]);
-        setNewProduct(initialNewProduct);
-        setIsAddDialogOpen(false);
+    useEffect(() => {
+        fetchProducts();
+    }, [currentPage, searchTerm]);
+
+    const handleAddProduct = async () => {
+        try {
+            const response = await fetch('/api/products', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(newProduct),
+            });
+            if (!response.ok) throw new Error('Failed to add product');
+            fetchProducts();
+            setNewProduct(initialNewProduct);
+            setIsAddDialogOpen(false);
+        } catch (err) {
+            setError(err.message);
+        }
     };
 
-    const filteredProducts = products.filter(product =>
-        product.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const handleUpdateProduct = async (productId, updatedData) => {
+        try {
+            const response = await fetch(`/api/products/${productId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(updatedData),
+            });
+            if (!response.ok) throw new Error('Failed to update product');
+            fetchProducts();
+            setEditingProduct(null);
+        } catch (err) {
+            setError(err.message);
+        }
+    };
 
     return (
         <div className="p-8 max-w-7xl mx-auto">
@@ -86,13 +114,13 @@ const ProductAdmin = () => {
                                 <Plus className="mr-2 h-4 w-4" /> Add New Product
                             </Button>
                         </DialogTrigger>
-                        <DialogContent className="max-w-2xl">
+                        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
                             <DialogHeader>
                                 <DialogTitle>Add New Product</DialogTitle>
                             </DialogHeader>
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-2">
-                                    <Label htmlFor="name">Product Name</Label>
+                                    <Label htmlFor="name">Product Name *</Label>
                                     <Input
                                         id="name"
                                         value={newProduct.name}
@@ -100,25 +128,26 @@ const ProductAdmin = () => {
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="price">Price</Label>
+                                    <Label htmlFor="price">Price *</Label>
                                     <Input
                                         id="price"
                                         type="number"
+                                        step="0.01"
                                         value={newProduct.price}
                                         onChange={e => setNewProduct({...newProduct, price: parseFloat(e.target.value)})}
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="quantity">Initial Stock</Label>
+                                    <Label htmlFor="stockQuantity">Stock Quantity *</Label>
                                     <Input
-                                        id="quantity"
+                                        id="stockQuantity"
                                         type="number"
-                                        value={newProduct.stock_quantity}
-                                        onChange={e => setNewProduct({...newProduct, stock_quantity: parseInt(e.target.value)})}
+                                        value={newProduct.stockQuantity}
+                                        onChange={e => setNewProduct({...newProduct, stockQuantity: parseInt(e.target.value)})}
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="condition">Condition</Label>
+                                    <Label htmlFor="condition">Condition *</Label>
                                     <Select
                                         value={newProduct.condition}
                                         onValueChange={value => setNewProduct({...newProduct, condition: value})}
@@ -134,11 +163,63 @@ const ProductAdmin = () => {
                                     </Select>
                                 </div>
                                 <div className="space-y-2 col-span-2">
-                                    <Label htmlFor="description">Description</Label>
+                                    <Label htmlFor="description">Description *</Label>
                                     <Textarea
                                         id="description"
                                         value={newProduct.description}
                                         onChange={e => setNewProduct({...newProduct, description: e.target.value})}
+                                    />
+                                </div>
+                                <div className="space-y-2 col-span-2">
+                                    <Label htmlFor="detailedDescription">Detailed Description</Label>
+                                    <Textarea
+                                        id="detailedDescription"
+                                        value={newProduct.detailedDescription}
+                                        onChange={e => setNewProduct({...newProduct, detailedDescription: e.target.value})}
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="modelNumber">Model Number</Label>
+                                    <Input
+                                        id="modelNumber"
+                                        value={newProduct.modelNumber}
+                                        onChange={e => setNewProduct({...newProduct, modelNumber: e.target.value})}
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="manufacturingDate">Manufacturing Date</Label>
+                                    <Input
+                                        id="manufacturingDate"
+                                        type="date"
+                                        value={newProduct.manufacturingDate}
+                                        onChange={e => setNewProduct({...newProduct, manufacturingDate: e.target.value})}
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="weight">Weight (kg)</Label>
+                                    <Input
+                                        id="weight"
+                                        type="number"
+                                        step="0.01"
+                                        value={newProduct.weight}
+                                        onChange={e => setNewProduct({...newProduct, weight: e.target.value})}
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="lowStockThreshold">Low Stock Threshold</Label>
+                                    <Input
+                                        id="lowStockThreshold"
+                                        type="number"
+                                        value={newProduct.lowStockThreshold}
+                                        onChange={e => setNewProduct({...newProduct, lowStockThreshold: parseInt(e.target.value)})}
+                                    />
+                                </div>
+                                <div className="space-y-2 col-span-2">
+                                    <Label htmlFor="warrantyInfo">Warranty Information</Label>
+                                    <Textarea
+                                        id="warrantyInfo"
+                                        value={newProduct.warrantyInfo}
+                                        onChange={e => setNewProduct({...newProduct, warrantyInfo: e.target.value})}
                                     />
                                 </div>
                                 <div className="col-span-2">
@@ -151,6 +232,12 @@ const ProductAdmin = () => {
                     </Dialog>
                 </CardHeader>
                 <CardContent>
+                    {error && (
+                        <Alert variant="destructive" className="mb-4">
+                            <AlertDescription>{error}</AlertDescription>
+                        </Alert>
+                    )}
+
                     <div className="flex items-center space-x-2 mb-4">
                         <Search className="h-5 w-5 text-gray-500" />
                         <Input
@@ -160,34 +247,43 @@ const ProductAdmin = () => {
                             className="max-w-sm"
                         />
                     </div>
+
                     <div className="rounded-md border">
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead>Product ID</TableHead>
+                                    <TableHead>ID</TableHead>
                                     <TableHead>Name</TableHead>
-                                    <TableHead>Stock Quantity</TableHead>
+                                    <TableHead>Stock</TableHead>
                                     <TableHead>Price</TableHead>
                                     <TableHead>Condition</TableHead>
                                     <TableHead>Status</TableHead>
+                                    <TableHead>Tags</TableHead>
                                     <TableHead>Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {filteredProducts.map(product => (
-                                    <TableRow key={product.product_id}>
-                                        <TableCell>{product.product_id}</TableCell>
+                                {isLoading ? (
+                                    <TableRow>
+                                        <TableCell colSpan={8} className="text-center">Loading...</TableCell>
+                                    </TableRow>
+                                ) : products.map(product => (
+                                    <TableRow key={product.id}>
+                                        <TableCell>{product.id}</TableCell>
                                         <TableCell>{product.name}</TableCell>
                                         <TableCell>
-                                            {editingProduct === product.product_id ? (
+                                            {editingProduct === product.id ? (
                                                 <Input
                                                     type="number"
-                                                    value={product.stock_quantity}
-                                                    onChange={e => handleQuantityChange(product.product_id, e.target.value)}
+                                                    value={product.quantity}
+                                                    onChange={e => handleUpdateProduct(product.id, {
+                                                        ...product,
+                                                        quantity: parseInt(e.target.value)
+                                                    })}
                                                     className="w-24"
                                                 />
                                             ) : (
-                                                product.stock_quantity
+                                                product.quantity
                                             )}
                                         </TableCell>
                                         <TableCell>${product.price.toFixed(2)}</TableCell>
@@ -200,37 +296,54 @@ const ProductAdmin = () => {
                       </span>
                                         </TableCell>
                                         <TableCell>
-                                            {editingProduct === product.product_id ? (
-                                                <div className="flex space-x-2">
-                                                    <Button
-                                                        size="sm"
-                                                        variant="outline"
-                                                        onClick={() => setEditingProduct(null)}
-                                                    >
-                                                        <Save className="h-4 w-4" />
-                                                    </Button>
-                                                    <Button
-                                                        size="sm"
-                                                        variant="outline"
-                                                        onClick={() => setEditingProduct(null)}
-                                                    >
-                                                        <X className="h-4 w-4" />
-                                                    </Button>
-                                                </div>
-                                            ) : (
-                                                <Button
-                                                    size="sm"
-                                                    variant="outline"
-                                                    onClick={() => setEditingProduct(product.product_id)}
-                                                >
-                                                    <Edit className="h-4 w-4" />
-                                                </Button>
-                                            )}
+                                            <div className="flex flex-wrap gap-1">
+                                                {product.tags.map((tag, index) => (
+                                                    <span key={index} className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
+                            {tag}
+                          </span>
+                                                ))}
+                                            </div>
+                                        </TableCell>
+                                        <TableCell>
+                                            <Button
+                                                size="sm"
+                                                variant="outline"
+                                                onClick={() => setEditingProduct(product.id)}
+                                            >
+                                                <Edit className="h-4 w-4" />
+                                            </Button>
                                         </TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody>
                         </Table>
+                    </div>
+
+                    <div className="flex items-center justify-between mt-4">
+                        <div className="text-sm text-gray-500">
+                            Showing {products.length} of {totalItems} items
+                        </div>
+                        <div className="flex items-center space-x-2">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setCurrentPage(p => Math.max(0, p - 1))}
+                                disabled={currentPage === 0}
+                            >
+                                <ChevronLeft className="h-4 w-4" />
+                            </Button>
+                            <span className="text-sm">
+                Page {currentPage + 1} of {totalPages}
+              </span>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setCurrentPage(p => Math.min(totalPages - 1, p + 1))}
+                                disabled={currentPage === totalPages - 1}
+                            >
+                                <ChevronRight className="h-4 w-4" />
+                            </Button>
+                        </div>
                     </div>
                 </CardContent>
             </Card>

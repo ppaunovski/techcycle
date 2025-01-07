@@ -35,7 +35,7 @@ data class Notification (
 
     @ColumnDefault("false")
     @Column(name = "is_read")
-    var isRead: Boolean = false,
+    var read: Boolean = false,
 
     @Column(name = "read_at")
     var readAt: Instant? = null,

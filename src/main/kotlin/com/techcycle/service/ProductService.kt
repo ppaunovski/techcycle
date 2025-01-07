@@ -69,7 +69,7 @@ class ProductService(
         )
 
         val pageable = PageRequest.of(
-            page - 1,
+            page,
             size
         )
 
