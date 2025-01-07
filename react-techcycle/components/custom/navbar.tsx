@@ -24,13 +24,24 @@ const Navbar = () => {
         }
     }, []);
 
-    const handleLogout = () => {
+    const handleLogout = async () => {
+        if(localStorage.getItem('userInteraction') != null) {
+            let response = await fetch("/api/interaction", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${localStorage.getItem('token')}`
+                },
+                body: JSON.stringify(JSON.parse(localStorage.getItem('userInteractions') ?? ''))
+            })
+        }
         localStorage.removeItem('firstName');
         localStorage.removeItem('lastName');
         localStorage.removeItem('username');
         localStorage.removeItem('cartId');
         localStorage.removeItem('productCount');
         localStorage.removeItem('token');
+        localStorage.removeItem('userInteractions');
         setUser(null);
         router.push('/');
     };

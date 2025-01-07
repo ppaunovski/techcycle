@@ -5,6 +5,7 @@ import { Star, ShoppingCart, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import DisplayImage from "@/components/custom/img-display";
+import {saveInteractions} from "@/service/interaction.service";
 
 
 interface ProductImage {
@@ -82,6 +83,7 @@ const ProductDetailPage = () => {
     }, [id]);
 
     const addToCart = async () => {
+        if (product !== null) saveInteractions(product.id, "PUT_IN_CART", false)
         try {
             const cartId = localStorage.getItem('cartId');
             // if (!cartId) throw new Error('No cart found');

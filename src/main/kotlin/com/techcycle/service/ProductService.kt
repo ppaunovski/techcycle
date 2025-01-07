@@ -1,12 +1,16 @@
 package com.techcycle.service
 
 import com.techcycle.domain.*
+import com.techcycle.domain.enums.InteractionType
 import com.techcycle.repository.*
 import jakarta.persistence.criteria.JoinType
 import jakarta.persistence.criteria.Predicate
 import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Service
 
 data class ProductResponse(
@@ -44,6 +48,8 @@ class ProductService(
     private val productCategoriesMappingRepository: ProductCategoriesMappingRepository,
     private val productImagesService: ProductImagesService,
     private val productReviewRepository: ProductReviewRepository,
+    private val interactionRepository: InteractionRepository,
+    private val bestsellersRepository: BestsellersRepository
 ) {
     fun findProducts(
         page: Int,
@@ -107,11 +113,30 @@ class ProductService(
     }
 
     fun getBestsellers(): List<ProductDTO> {
-        return getFeaturedProducts()
+        return bestsellersRepository.findAll(Pageable.ofSize(4)).map {
+            val product = findById(it.id)
+            ProductDTO(
+                name = it.name,
+                price = it.price,
+                description = it.description,
+                id = it.id.toString(),
+                quantity = it.stockQuantity.toInt(),
+                tags = product?.productTagsMappings?.map { tag -> tag.tag.name } ?: emptyList(),
+                imageUrl = productImagesService.findPrimaryForProduct(product!!) ?: "".toByteArray()
+            )
+        }.toList()
     }
 
     fun getRecentlyViewed(): List<ProductDTO> {
-        return getFeaturedProducts()
+        val user = when (val principal = SecurityContextHolder.getContext().authentication.principal) {
+            is UserDetails -> principal as User
+            else -> return getFeaturedProducts()
+        }
+        return interactionRepository.findAllByUserAndInteractionTypeOrderByCreatedAtDesc(
+            user,
+            InteractionType.CLICKED,
+            Pageable.ofSize(4)
+        ).map { it.product.toDTO(bytes = productImagesService.findPrimaryForProduct(it.product) ?: "".toByteArray()) }
     }
 
 }

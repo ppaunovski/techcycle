@@ -5,6 +5,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import {Category, fetchCategories, fetchTags, fetchWithToken, Tag} from "@/service/categories.service";
 import Link from "next/link";
 import DisplayImage from "@/components/custom/img-display";
+import {saveInteractions} from "@/service/interaction.service";
 
 const ProductsPage = () => {
     // State management
@@ -89,6 +90,19 @@ const ProductsPage = () => {
         }));
     };
 
+    function handleMouseEnter(e, productId) {
+        console.log(productId,e)
+        saveInteractions(productId, 'HOVER', false)
+    }
+    function handleMouseLeave(e, productId) {
+        console.log(productId,e)
+        saveInteractions(productId, 'HOVER', true)
+    }
+    function handleMouseClick(e, productId) {
+        console.log(productId,e)
+        saveInteractions(productId, 'CLICKED', true)
+    }
+
     return (
         <div className="max-w-7xl mx-auto px-4 py-8">
             {/* Filters Section */}
@@ -162,7 +176,7 @@ const ProductsPage = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                     {products.map(product => (
 
-                       <Link href={'/products/'+product.id}>
+                       <Link onClick={(e) => handleMouseClick(e, product.id)} onMouseLeave={(e) => handleMouseLeave(e, product.id)} onMouseEnter={(e) => handleMouseEnter(e, product.id)} href={'/products/'+product.id}>
                            <Card key={product.id} className="flex flex-col">
                                <CardHeader>
                                    {/*<img*/}

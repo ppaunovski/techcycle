@@ -3,6 +3,7 @@ package com.techcycle.service
 import com.techcycle.api.request.PlaceOrderRequest
 import com.techcycle.domain.*
 import com.techcycle.domain.enums.CartStatus
+import com.techcycle.domain.enums.InteractionType
 import com.techcycle.domain.enums.OrderStatus
 import com.techcycle.domain.enums.PaymentMethod
 import com.techcycle.repository.*
@@ -14,7 +15,6 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
 import java.time.Instant
-import java.time.LocalDateTime
 
 @Service
 class OrderService(
@@ -27,6 +27,7 @@ class OrderService(
     private val cartItemRepository: CartItemRepository,
     private val productImagesService: ProductImagesService,
     private val orderStatusHistoryRepository: OrderStatusHistoryRepository,
+    private val interactionService: InteractionService,
 ) {
     fun getPaymentMethods() = PaymentMethod.entries.map { it.type }.toTypedArray()
 
@@ -77,6 +78,7 @@ class OrderService(
         ))
 
         cartItemRepository.findAllByCart(cart).map {
+            interactionService.saveInteraction(interactionType = InteractionType.ORDERED, product = it.product, user = user)
             OrderItem(
                 totalAmount = it.product.price * it.quantity.toBigDecimal(),
                 discountAmount = 0.toBigDecimal(),
