@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: TechCycle
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: validate
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    password: techcycle
+    username: techcycle
+    url: jdbc:postgresql://localhost:5432/techcycle
