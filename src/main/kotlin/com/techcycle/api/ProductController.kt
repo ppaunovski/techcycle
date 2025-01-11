@@ -57,7 +57,4 @@ class ProductController(
 
     @GetMapping("/recently-viewed")
     fun getRecentlyViewed() = service.getRecentlyViewed()
-
-    @PutMapping("/{id}")
-    fun updateProduct(@PathVariable id: Long) = service.update(productId = id)
 }
