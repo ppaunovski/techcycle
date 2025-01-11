@@ -65,7 +65,7 @@ class AuthService(
             return authenticate(
                 AuthRequest(
                     user.email,
-                    user.passwordHash
+                    registerPassword
                 )
             )
         }
