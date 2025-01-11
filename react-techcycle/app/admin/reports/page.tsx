@@ -89,7 +89,7 @@ const ReportDashboard = () => {
                                         <XAxis dataKey="month" />
                                         <YAxis />
                                         <Tooltip
-                                            formatter={(value) => [`$${value.toLocaleString()}`, 'Sales']}
+                                            formatter={(value) => [`${value.toLocaleString()}`, 'Sales']}
                                         />
                                         <Line
                                             type="monotone"
@@ -120,7 +120,7 @@ const ReportDashboard = () => {
                                         />
                                         <YAxis />
                                         <Tooltip
-                                            formatter={(value) => [`$${value.toLocaleString()}`, 'Sales']}
+                                            formatter={(value) => [`${value.toLocaleString()}`, 'Sales']}
                                         />
                                         <Bar dataKey="sales" fill="#8884d8" />
                                     </BarChart>
@@ -144,7 +144,7 @@ const ReportDashboard = () => {
                                         />
                                         <YAxis />
                                         <Tooltip
-                                            formatter={(value) => [`$${value.toLocaleString()}`, 'Sales']}
+                                            formatter={(value) => [`${value.toLocaleString()}`, 'Sales']}
                                         />
                                         <Legend />
                                         {Object.entries(productSalesByMonth).map(([product, data], index) => (
@@ -200,7 +200,7 @@ const ReportDashboard = () => {
                                                 {sale.year?.toString()}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                ${parseFloat(sale.totalSales).toLocaleString()}
+                                                {parseFloat(sale.totalSales).toLocaleString()}
                                             </td>
                                         </tr>
                                     ))}
