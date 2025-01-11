@@ -197,7 +197,7 @@ class ReportService(
                 startDate,
                 ZoneId.systemDefault()
             ).year
-        ).sortedBy { it.totalSales }.subList(0,5)
+        ).sortedBy { it.totalSales }
         val metadata = ReportMetadata(
             reportType = RegularReportType.MONTHLY_PERFORMANCE.toString(),
             period = "${LocalDateTime.ofInstant(startDate, ZoneId.systemDefault()).year}-${
