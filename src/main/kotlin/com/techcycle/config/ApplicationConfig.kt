@@ -40,6 +40,6 @@ class ApplicationConfig(
     fun authenticationManager(config: AuthenticationConfiguration): AuthenticationManager =
         config.authenticationManager
 
-    @Bean // Makes ZonedDateTime compatible with auditing fields
+    @Bean 
     fun auditingDateTimeProvider()= DateTimeProvider { of(ZonedDateTime.now()) }
 }

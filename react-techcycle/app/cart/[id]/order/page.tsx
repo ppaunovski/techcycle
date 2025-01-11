@@ -27,16 +27,16 @@ const CheckoutPage = ({ params }: { params: { id: string } }) => {
     });
 
     useEffect(() => {
-        // Check authentication status
+        
         checkAuthStatus();
-        // Fetch order information
+        
         fetchOrderInfo();
         fetchPaymentMethods();
     }, []);
 
     const checkAuthStatus = async () => {
         try {
-            // Replace with your actual auth check
+            
             const response = await fetch('/api/auth/status');
             const data = await response.json();
             setIsAuthenticated(data.isAuthenticated);
@@ -50,7 +50,7 @@ const CheckoutPage = ({ params }: { params: { id: string } }) => {
     const fetchOrderInfo = async () => {
         try {
             const cartId = params.id
-            // Replace cartId with actual cart ID from your state management
+            
             const response = await fetch(`/api/cart/${cartId}/order-info`, {
                 headers: {
                     "Authorization": `Bearer ${localStorage.getItem('token')}`
@@ -65,7 +65,7 @@ const CheckoutPage = ({ params }: { params: { id: string } }) => {
 
     const fetchPaymentMethods = async () => {
         try {
-            // Replace cartId with actual cart ID from your state management
+            
             const response = await fetch(`/api/orders/payment-methods`, {
                 headers: {
                     "Authorization": `Bearer ${localStorage.getItem('token')}`
@@ -88,7 +88,7 @@ const CheckoutPage = ({ params }: { params: { id: string } }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        // Add your checkout logic here
+        
         console.log('Submitting order:', formData);
 
         const response = await fetch("/api/orders", {

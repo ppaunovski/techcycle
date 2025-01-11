@@ -75,7 +75,7 @@ export class LoginComponent {
   onLogin() {
     if (this.loginForm.valid) {
       console.log(this.loginForm.value);
-      // Trigger login API here
+
     }
   }
 }

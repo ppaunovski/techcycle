@@ -25,18 +25,16 @@ class ReportController(private val reportService: ReportService) {
     @GetMapping("/adhoc/{type}")
     fun getAdHocReport(
         @PathVariable type: AdHocReportType,
-        @RequestParam startDate: LocalDate?,
-        @RequestParam endDate: LocalDate?,
-        @RequestParam filters: Map<String, String>?
+        @RequestParam startDate: Instant,
     ): ReportResponse {
-        return reportService.generateAdHocReport(type, startDate, endDate, filters)
+        return reportService.generateAdHocReport(type, startDate)
     }
 
-//    @GetMapping("/history")
-//    fun getReportHistory(
-//        @RequestParam(defaultValue = "0") page: Int,
-//        @RequestParam(defaultValue = "20") size: Int
-//    ): Page<ReportResponse> {
-//        return reportService.getReportHistory(page, size)
-//    }
+
+
+
+
+
+
+
 }

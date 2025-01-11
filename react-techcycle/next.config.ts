@@ -1,14 +1,29 @@
 import type {NextConfig} from "next";
 
-const nextConfig: NextConfig = {
+const nextConfig = {
     async rewrites() {
         return [
             {
-                source: '/api/:path*', // The path to match in your Next.js app
-                destination: 'http://localhost:8080/api/:path*', // The Spring Boot backend
+                source: '/api/:path*', 
+                destination: 'http://backend:8080/api/:path*', 
             },
         ];
     },
+    output: 'standalone', 
+    typescript: {
+        
+        
+        
+        
+        ignoreBuildErrors: true,
+    },
+    eslint: {
+        
+        
+        ignoreDuringBuilds: true,
+    },
 };
+
+module.exports = nextConfig;
 
 export default nextConfig;

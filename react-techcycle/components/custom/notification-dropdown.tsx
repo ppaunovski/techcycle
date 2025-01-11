@@ -26,7 +26,7 @@ export default function NotificationsDropdown() {
                 console.log('notifications',response)
                 const data = await response.json();
                 console.log('notif', data)
-                setNotifications(data); // Assume `data` is an array of notifications
+                setNotifications(data); 
                 if (!response.ok) {
                     throw new Error("Failed to fetch notifications");
                 }

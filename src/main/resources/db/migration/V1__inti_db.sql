@@ -211,10 +211,7 @@ create table if not exists public.order_status_history
     order_id   bigint
         constraint fknmcbg3mmbt8wfva97ra40nmp3
             references public.orders,
-    status     varchar(20) not null
-        constraint order_status_history_status_check
-            check ((status)::text = ANY
-                   ((ARRAY ['PENDING'::character varying, 'APPROVED'::character varying, 'REJECTED'::character varying, 'SHIPPING'::character varying, 'SHIPPED'::character varying, 'CLOSED'::character varying])::text[])),
+    status     varchar(20) not null,
     comment    text
 );
 

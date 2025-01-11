@@ -20,7 +20,7 @@ class UserService(
         val authentication = SecurityContextHolder.getContext().authentication
         return when (val principal = authentication.principal) {
             is UserDetails -> principal.username
-            is String -> principal // In case of a simple String principal (e.g., for basic authentication)
+            is String -> principal 
             else -> throw IllegalStateException("Principal is not valid")
         }
     }

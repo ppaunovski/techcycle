@@ -21,7 +21,7 @@ const Navbar = () => {
     const router = useRouter();
 
     useEffect(() => {
-        // Check localStorage for user data when component mounts
+        
         const firstName = localStorage.getItem('firstName');
         const lastName = localStorage.getItem('lastName');
 
@@ -87,6 +87,9 @@ const Navbar = () => {
                                         <DropdownMenuItem asChild>
                                             <Link href="/admin/products" className="w-full">
                                                 Products
+                                            </Link>
+                                            <Link href="/admin/reports" className="w-full">
+                                                Reports
                                             </Link>
                                         </DropdownMenuItem>
 

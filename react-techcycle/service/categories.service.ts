@@ -18,7 +18,7 @@ export const fetchCategories = async (setCategories: React.Dispatch<React.SetSta
             headers: {
                 "Authorization": `Bearer ${localStorage.getItem('token')}`
             }
-        }); // Replace with your backend endpoint
+        }); 
         if (!response.ok) {
             throw new Error("Failed to fetch categories");
         }
@@ -39,7 +39,7 @@ export const fetchTags = async (setTags: React.Dispatch<React.SetStateAction<Tag
             headers: {
                 "Authorization": `Bearer ${localStorage.getItem('token')}`
             }
-        }); // Replace with your backend endpoint
+        }); 
         if (!response.ok) {
             throw new Error("Failed to fetch tags");
         }

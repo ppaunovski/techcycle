@@ -50,7 +50,7 @@ const ProductDetailPage = () => {
             setLoading(true);
             setError(null);
             try {
-                // Fetch product details, images, and reviews in parallel
+                
                 const [productRes, imagesRes, reviewsRes] = await Promise.all([
                     fetch(`/api/products/${id}`, {headers: {"Authorization": `Bearer ${localStorage.getItem('token')}`}}),
                     fetch(`/api/products/${id}/images`, {headers: {"Authorization": `Bearer ${localStorage.getItem('token')}`}}),
@@ -86,7 +86,7 @@ const ProductDetailPage = () => {
         if (product !== null) saveInteractions(product.id, "PUT_IN_CART", false)
         try {
             const cartId = localStorage.getItem('cartId');
-            // if (!cartId) throw new Error('No cart found');
+            
 
             const response = await fetch(`/api/cart`, {
                 method: 'POST',
@@ -103,8 +103,8 @@ const ProductDetailPage = () => {
 
             if (!response.ok) throw new Error('Failed to add to cart');
 
-            // Show success message or redirect to cart
-            // You can implement your preferred feedback mechanism here
+            
+            
             const data = await response.json()
             localStorage.setItem('cartId', data.id)
             localStorage.setItem('productCount', data.productCount)

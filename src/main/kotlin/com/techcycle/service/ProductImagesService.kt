@@ -31,34 +31,43 @@ class ProductImagesService(
         val productFolderPath = "src/main/resources/static/products"
         val productFolder = File(productFolderPath)
 
-        if (productFolder.exists() && productFolder.isDirectory) {
-            for (productDir in Objects.requireNonNull(productFolder.listFiles())) {
-                if (productDir.exists() && productDir.isDirectory) {
-                    val productId = productDir.name.toLong()
+        val classLoader = javaClass.classLoader
+        val folder = classLoader.getResource("static/products")?.file?.let { File(it) }
 
-                    for(file in Objects.requireNonNull(productDir.listFiles())) {
-                        if (file.exists() && file.isFile) {
-                            val imgData = Files.readAllBytes(file.toPath())
-                            val product = productRepository.findByIdOrNull(productId)
-                            product?.let {
-                                imagesRepository.save(
-                                    ProductImage(
-                                        product = it,
-                                        bytes = imgData,
-                                        imageUrl = file.absolutePath,
-                                        title = file.name,
-                                        isPrimary = Objects.requireNonNull(productDir.listFiles()).indexOf(file) == 0,
-                                        displayOrder = Objects.requireNonNull(productDir.listFiles()).indexOf(file).toLong(),
-                                        altText = "img"
-                                    )
+        if (productFolder.exists() && productFolder.isDirectory) {
+            addFileBytes(productFolder)
+        } else if (folder != null && folder.isDirectory) {
+            addFileBytes(folder)
+        }
+
+    }
+
+    private fun addFileBytes(productFolder: File) {
+        for (productDir in Objects.requireNonNull(productFolder.listFiles())) {
+            if (productDir.exists() && productDir.isDirectory) {
+                val productId = productDir.name.toLong()
+
+                for(file in Objects.requireNonNull(productDir.listFiles())) {
+                    if (file.exists() && file.isFile) {
+                        val imgData = Files.readAllBytes(file.toPath())
+                        val product = productRepository.findByIdOrNull(productId)
+                        product?.let {
+                            imagesRepository.save(
+                                ProductImage(
+                                    product = it,
+                                    bytes = imgData,
+                                    imageUrl = file.absolutePath,
+                                    title = file.name,
+                                    isPrimary = Objects.requireNonNull(productDir.listFiles()).indexOf(file) == 0,
+                                    displayOrder = Objects.requireNonNull(productDir.listFiles()).indexOf(file).toLong(),
+                                    altText = "img"
                                 )
-                            }
+                            )
                         }
                     }
                 }
             }
         }
-
     }
 
     fun findPrimaryForProduct(product: Product) = imagesRepository.findByProductAndIsPrimary(product, true)?.bytes

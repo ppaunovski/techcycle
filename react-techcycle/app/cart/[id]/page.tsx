@@ -7,7 +7,7 @@ import {useRouter} from "next/navigation";
 import DisplayImage from "@/components/custom/img-display";
 
 
-// Types for cart data
+
 interface CartItem {
     id: number;
     productId: number;
@@ -74,7 +74,7 @@ const CartPage = () => {
 
             if (!response.ok) throw new Error('Failed to update quantity');
 
-            // Optimistically update the UI
+            
             setCart(prevCart => {
                 if (!prevCart) return null;
 
@@ -94,7 +94,7 @@ const CartPage = () => {
             });
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Failed to update quantity');
-            // Revert changes on error
+            
             fetchCart();
         }
     };
@@ -112,7 +112,7 @@ const CartPage = () => {
 
             if (!response.ok) throw new Error('Failed to remove item');
 
-            // Optimistically update the UI
+            
             setCart(prevCart => {
                 if (!prevCart) return null;
 

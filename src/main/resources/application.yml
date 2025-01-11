@@ -2,7 +2,6 @@ spring:
   application:
     name: TechCycle
   jpa:
-    show-sql: true
     hibernate:
       ddl-auto: validate
   datasource:

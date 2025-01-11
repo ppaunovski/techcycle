@@ -88,6 +88,12 @@ class ProductService(
         )
     }
 
+    fun update(productId: Long, stock: Long) {
+        productRepository.findByIdOrNull(productId)?.let {
+            it.stockQuantity = stock
+            productRepository.save(it)
+        }
+    }
     fun findById(productId: Long) = productRepository.findByIdOrNull(productId)
     fun getById(id: Long): ProductDetailsResponse {
         return findById(id)?.let { product ->
@@ -167,10 +173,10 @@ class ProductSpecification {
             return Specification { root, query, criteriaBuilder ->
                 val predicates = mutableListOf<Predicate>()
 
-                // Avoid duplicate results when joining with multiple tables
+                
                 query?.distinct(true)
 
-                // Search by name or description
+                
                 search?.let {
                     val searchLower = it.lowercase()
                     predicates.add(
@@ -187,7 +193,7 @@ class ProductSpecification {
                     )
                 }
 
-                // Filter by categories through mapping table
+                
                 categoryIds?.let { ids ->
                     if (ids.isNotEmpty()) {
                         val categoryMapping =
@@ -198,7 +204,7 @@ class ProductSpecification {
                     }
                 }
 
-                // Filter by price range
+                
                 minPrice?.let {
                     predicates.add(
                         criteriaBuilder.greaterThanOrEqualTo(root.get("price"), it)
@@ -211,7 +217,7 @@ class ProductSpecification {
                     )
                 }
 
-                // Filter by tags through mapping table
+                
                 tagIds?.let { ids ->
                     if (ids.isNotEmpty()) {
                         val tagMapping = root.join<Product, ProductTagsMapping>("productTagsMappings", JoinType.LEFT)

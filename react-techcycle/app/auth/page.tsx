@@ -51,7 +51,7 @@ const Page = () => {
     const handleLogin = async (e) => {
         e.preventDefault();
         console.log(loginRequest)
-        // Add your login logic here
+        
         const resp = await fetch("/api/auth/login", {
             method: "POST",
             headers: {
@@ -78,7 +78,7 @@ const Page = () => {
     const handleRegister = async (e) => {
         e.preventDefault();
         console.log(registerRequest)
-        // Add your registration logic here
+        
         const resp = await fetch("/api/auth/register", {
             method: "POST",
             headers: {

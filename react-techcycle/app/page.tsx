@@ -14,7 +14,7 @@ const LandingPage = () => {
   const [recentlyViewed, setRecentlyViewed] = useState([]);
 
   useEffect(() => {
-    // Fetch data from your API endpoints
+    
     fetchFeaturedProducts();
     fetchBestSellers();
     fetchRecentlyViewed();

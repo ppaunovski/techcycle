@@ -1,0 +1,4 @@
+docker network create app-network
+docker run -d --name db --network app-network -e POSTGRES_USER=techcycle -e POSTGRES_PASSWORD=techcycle -e POSTGRES_DB=techcycle postgres
+docker run -d --name backend --network app-network -e DB_HOST=db -e DB_USER=techcycle -e DB_PASSWORD=techcycle -p 8080:8080 techcycle_jar
+docker run -d --name frontend --network app-network -p 80:3000 techcycle_next

@@ -8,7 +8,7 @@ import DisplayImage from "@/components/custom/img-display";
 import {saveInteractions} from "@/service/interaction.service";
 
 const ProductsPage = () => {
-    // State management
+    
     const [categories, setCategories] = useState<Category[]>([]);
     const [availableTags, setTags] = useState<Tag[]>([]);
     const [products, setProducts] = useState([]);
@@ -27,18 +27,18 @@ const ProductsPage = () => {
         itemsPerPage: 12,
     });
 
-    // Categories and tags (you can fetch these from backend too)
+    
     useEffect(() => {
         fetchCategories(setCategories, null).then(r => {})
         fetchTags(setTags, null).then(r => {})
     }, []);
-    // const categories = ['CPU', 'GPU', 'RAM', 'Storage', 'Motherboard', 'Power Supply'];
-    // const availableTags = ['Refurbished', 'Like New', 'Tested', 'Warranty', 'Gaming'];
-    // Fetch products with filters and pagination
+    
+    
+    
     const fetchProducts = async () => {
         setLoading(true);
         try {
-            // Construct query parameters
+            
             const queryParams = new URLSearchParams({
                 page: pagination.currentPage,
                 limit: pagination.itemsPerPage,
@@ -69,18 +69,18 @@ const ProductsPage = () => {
         }
     };
 
-    // Fetch products when filters or pagination changes
+    
     useEffect(() => {
         fetchProducts();
     }, [filters, pagination.currentPage]);
 
-    // Handle filter changes
+    
     const handleFilterChange = (key, value) => {
         setFilters(prev => ({ ...prev, [key]: value }));
-        setPagination(prev => ({ ...prev, currentPage: 1 })); // Reset to first page
+        setPagination(prev => ({ ...prev, currentPage: 1 })); 
     };
 
-    // Handle tag toggle
+    
     const handleTagToggle = (tag: Tag) => {
         setFilters(prev => ({
             ...prev,
@@ -173,11 +173,11 @@ const ProductsPage = () => {
             {loading ? (
                 <div className="text-center py-8">Loading...</div>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <div className="flex flex-wrap items-stretch justify-between gap-6">
                     {products.map(product => (
 
-                       <Link onClick={(e) => handleMouseClick(e, product.id)} onMouseLeave={(e) => handleMouseLeave(e, product.id)} onMouseEnter={(e) => handleMouseEnter(e, product.id)} href={'/products/'+product.id}>
-                           <Card key={product.id} className="flex flex-col">
+                       <Link className="w-[23.5%] self-stretch" onClick={(e) => handleMouseClick(e, product.id)} onMouseLeave={(e) => handleMouseLeave(e, product.id)} onMouseEnter={(e) => handleMouseEnter(e, product.id)} href={'/products/'+product.id}>
+                           <Card key={product.id} className="flex flex-col h-full">
                                <CardHeader>
                                    {/*<img*/}
                                    {/*    src={product.imageUrl || '/api/placeholder/300/200'}*/}

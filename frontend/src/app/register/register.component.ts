@@ -85,7 +85,7 @@ export class RegisterComponent {
   onRegister() {
     if (this.registerForm.valid) {
       console.log(this.registerForm.value);
-      // Trigger registration API here
+
     }
   }
 }
