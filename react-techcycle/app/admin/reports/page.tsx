@@ -593,11 +593,11 @@ const ReportDashboard = () => {
                                     <PopoverContent className="w-auto p-0" align="start">
                                         <Calendar
                                             initialFocus
-                                            mode={reportCategory === 'adhoc' ? "single" : "range"}
+                                            mode={"range"}
                                             defaultMonth={dateRange?.from}
                                             selected={dateRange}
                                             onSelect={setDateRange}
-                                            numberOfMonths={reportCategory === 'adhoc' ? 1 : 2}
+                                            numberOfMonths={2}
                                         />
                                     </PopoverContent>
                                 </Popover>
