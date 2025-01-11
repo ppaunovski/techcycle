@@ -52,7 +52,7 @@ class AuthService(
             if (registerPassword != confirmPassword) throw RuntimeException("Passwords don't match")
             if (repository.existsByEmail(email)) throw RuntimeException("Email already registered")
 
-            val user = repository.save(
+            val user = repository.saveAndFlush(
                 User(
                     email = email,
                     passwordHash = encoder.encode(registerPassword),
