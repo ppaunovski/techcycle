@@ -88,11 +88,12 @@ const Navbar = () => {
                                             <Link href="/admin/products" className="w-full">
                                                 Products
                                             </Link>
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem asChild>
                                             <Link href="/admin/reports" className="w-full">
                                                 Reports
                                             </Link>
                                         </DropdownMenuItem>
-
                                 </DropdownMenuContent>
                             </DropdownMenu>
                         </div>
